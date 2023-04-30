@@ -1,20 +1,17 @@
 import { Component } from 'react';
-import { Form, Label, Input, SubmitButton } from './ContactForm.styled';
+import { FormikForm, Label, Input, SubmitButton } from './ContactForm.styled';
+import { Formik, ErrorMessage } from 'formik';
+import { validationSchema } from 'services/validate-schema';
+
+const initialState = {
+    name: '',
+    number: '',
+};
 
 export class ContactForm extends Component {
-    state = {
-        name: '',
-        number: '',
-    };
-
-    onFormSubmit = e => {
-        e.preventDefault();
-        this.props.onSubmit(this.state);
-        this.resetForm();
-    };
-
-    resetForm = () => {
-        this.setState({ name: '', number: '' });
+    onFormSubmit = (values, { resetForm }) => {
+        this.props.onSubmit(values);
+        resetForm();
     };
 
     onleInputChange = e => {
@@ -24,35 +21,33 @@ export class ContactForm extends Component {
 
     render() {
         return (
-            <Form onSubmit={this.onFormSubmit}>
-                <Label>
-                    Name
-                    <Input
-                        type="text"
-                        name="name"
-                        pattern="^[a-zA-Zа-яіїєґА-ЯІЇЄҐ]+(([' -][a-zA-Zа-яіїєґА-ЯІЇЄҐ ])?[a-zA-Zа-яіїєґА-ЯІЇЄҐ]*)*$"
-                        title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-                        required
-                        placeholder="Enter contact name"
-                        onChange={this.onleInputChange}
-                        value={this.state.name}
-                    />
-                </Label>
-                <Label>
-                    Number
-                    <Input
-                        type="tel"
-                        name="number"
-                        pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-                        title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-                        required
-                        placeholder="Enter contact number"
-                        onChange={this.onleInputChange}
-                        value={this.state.number}
-                    />
-                </Label>
-                <SubmitButton type="submit">Add contact</SubmitButton>
-            </Form>
+            <Formik
+                validationSchema={validationSchema}
+                initialValues={initialState}
+                onSubmit={this.onFormSubmit}
+            >
+                <FormikForm>
+                    <Label>
+                        Name
+                        <Input
+                            type="text"
+                            name="name"
+                            placeholder="Enter contact name"
+                        />
+                        <ErrorMessage name="name" />
+                    </Label>
+                    <Label>
+                        Number
+                        <Input
+                            type="tel"
+                            name="number"
+                            placeholder="Enter contact number"
+                        />
+                        <ErrorMessage name="number" />
+                    </Label>
+                    <SubmitButton type="submit">Add contact</SubmitButton>
+                </FormikForm>
+            </Formik>
         );
     }
 }
